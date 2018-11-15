@@ -1,0 +1,41 @@
+
+To Do:
+- incentive issues in the market
+- simulate market
+	- algs in Ash18 as baseline
+	- extension to account for factors
+
+Assumptions:
+- start with paper
+
+Incentives:
+- super simplify and discuss incentives ** [week 9]
+
+To Do:
+
+Group:
+- agree on assumptions baked into model
+
+Simulator:
+- write simulator
+
+Algorithms:
+- Ash18 ones
+- wait time into value
+- look-ahead **
+- Stochastic departures from market **
+
+Needs:
+- Graph with weights ~ to some function of (distance, etc) [can be changed]
+- Distribution of departure times baked into model
+- "Look ahead" - keep track of nodes yet to be added
+	-- queue of nodes to be added of length look_ahead_n
+
+
+Timeline:
+- Thu/Fri: Theo does simulator v1
+- Weekend/Monday: Derek implements algs in Ash18
+- Next week: Georgia and Emil implement extensions
+- Week 9: reconvene & finalize assumptions, simple example, comparisons
+- EOW 9: Poster, finish writup of simulations
+- Week 10: Finish project report ~10pgs

@@ -14,6 +14,7 @@ OPEN TODOS:
 TODO:
 - Update all weights in advance step
 	- Iterate over nodes or over edges?
+- Change node lists to sets
 
 Questions:
 - Should only one node come on at each time step?
@@ -73,8 +74,8 @@ class simulator:
 		self.N = N 							# total number of nodes
 		self.G = nx.Graph()					# graph
 		self.weight_func = weight_func		# weight function
-		self.buyer_nodes = []				# list of buyer nodes
-		self.seller_nodes = [] 				# list of seller nodes
+		self.buyer_nodes = set()			# list of buyer nodes
+		self.seller_nodes = set()			# list of seller nodes
 
 
 	def add_node(self, pos, dep_time, buyer):
@@ -98,14 +99,16 @@ class simulator:
 		nodes_to_connect = self.seller_nodes if buyer else self.buyer_nodes
 
 		for node in nodes_to_connect:
-			buyer_pos, buyer_d   = (pos, dep_time)    if buyer else (node.pos, node.d)
-			seller_pos, seller_d = (node.pos, node.d) if buyer else (pos, dep_time)
+			node_pos = self.G.nodes[node]['pos']
+			node_d = self.G.nodes[node]['d']
+			buyer_pos, buyer_d   = (pos, dep_time) if buyer else (node_pos, node_d)
+			seller_pos, seller_d = (node_pos, node_d) if buyer else (pos, dep_time)
 			self.G.add_edge(self.t, node, weight=
 							self.weight_func(buyer_pos, buyer_d, seller_pos, seller_d))
 
 		# Keep track if new node is buyer or seller
-		if buyer: self.buyer_nodes.append(self.n) 
-		else: self.seller_nodes.append(self.n)
+		if buyer: self.buyer_nodes.add(self.n) 
+		else: self.seller_nodes.add(self.n)
 				
 
 
@@ -132,14 +135,19 @@ class simulator:
 				node[1]['d'] -=1
 			else:
 				nodes_to_remove.append(node[0])
+				self.buyer_nodes.discard(node[0])
+				self.seller_nodes.discard(node[0])
 
 		# Removes nodes
 		self.G.remove_nodes_from(nodes_to_remove)
 
 		# Recalc weights if flagged
 		if recalc_weights:
-			for edge in self.G.edges:
-				print(edge)
+			for buyer in self.buyer_nodes:
+				for seller in self.G.neighbors(buyer):
+					new_weight = self.weight_func(buyer.pos, buyer.d, 
+													seller.pos, seller.d)
+					self.G[buyer, seller]['weight'] = new_weight
 
 
 

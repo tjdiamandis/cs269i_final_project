@@ -11,8 +11,10 @@ TODO:
 """
 
 
-def weight_function(x,y):
-	return abs(x-y)
+def weight_function(buyer_pos, buyer_d, seller_pos, seller_d):
+	bx, by = buyer_pos
+	sx, sy = seller_pos
+	return (bx-sx)**2 + (by-sy)**2
 
 N = 10
 

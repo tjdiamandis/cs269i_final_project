@@ -12,9 +12,7 @@ import networkx as nx
 OPEN TODOS:
 ************************************************************************
 TODO:
-- Update all weights in advance step
-	- Iterate over nodes or over edges?
-- Change node lists to sets
+- List of nodes to be added
 
 Questions:
 - Should only one node come on at each time step?
@@ -35,13 +33,14 @@ class simulator:
 	Instance variables:
 		t  			: current timestep (starts at 0)
 		n  			: index of last added node (starts at -1)
-		N  			: total number of nodes -- MIGHT REMOVE THIS?
 		G  			: graph containing state of market
 		weight_func : weight function for caluclating edge weights 
+		buyer_nodes : list of buyer nodes in market
+		seller_nodes: list of seller noes in market
 
 	Functions:
 		__init__ : initializes
-		add_node : adds a node to the graph with a given position & dep. time
+		add_node : adds a node to the graph with a given position & departure time
 		advance  : advances the market forward one step in time
 
 
@@ -59,19 +58,15 @@ class simulator:
 	Refer to individual function documentation for more information
     """
 
-	def __init__(self, N, weight_func):
+	def __init__(self, weight_func):
 		"""initializes instance of market
 		
 		Args:
-			N (int)  				: number of total nodes to be added 
-			weight_func (function)	: function specifying how pairwise weights
-									  should be calculated
-				Expected form of weight_func:
-					weight_func(buyer_pos, buyer_d, seller_pos, seller_d)
+			weight_func (function)	: function specifying how pairwise weights should be calculated
+				Expected form of weight_func: weight_func(buyer_pos, buyer_d, seller_pos, seller_d)
 		"""
 		self.t = 0							# time step
 		self.n = -1	 						# index of last added node
-		self.N = N 							# total number of nodes
 		self.G = nx.Graph()					# graph
 		self.weight_func = weight_func		# weight function
 		self.buyer_nodes = set()			# list of buyer nodes
@@ -142,11 +137,11 @@ class simulator:
 		self.G.remove_nodes_from(nodes_to_remove)
 
 		# Recalc weights if flagged
+		#  Iterates over buyers' edges; buyers are not connected to other buyers
 		if recalc_weights:
 			for buyer in self.buyer_nodes:
 				for seller in self.G.neighbors(buyer):
-					new_weight = self.weight_func(buyer.pos, buyer.d, 
-													seller.pos, seller.d)
+					new_weight = self.weight_func(buyer.pos, buyer.d, seller.pos, seller.d)
 					self.G[buyer, seller]['weight'] = new_weight
 
 

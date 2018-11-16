@@ -13,6 +13,7 @@ OPEN TODOS:
 ************************************************************************
 TODO:
 - List of nodes to be added
+	- When you add a node, specify that it will be added in k time steps?
 
 Questions:
 - Should only one node come on at each time step?
@@ -73,7 +74,7 @@ class simulator:
 		self.seller_nodes = set()			# list of seller nodes
 
 
-	def add_node(self, pos, dep_time, buyer):
+	def add_node(self, pos, dep_time, buyer, k=0):
 		"""Adds node to the market (buyer or seller)
 		
 		Args:
@@ -89,21 +90,25 @@ class simulator:
 			print("WARNING: at time {}, but node {} added"
 					.format(self.t,self.n))
 
-		# Add node n and add edges to all other nodes based on weight_fun
-		self.G.add_node(self.n, pos=pos, d=dep_time, buyer=buyer)
-		nodes_to_connect = self.seller_nodes if buyer else self.buyer_nodes
+		## TODO: Store node in queue if to be added in the future
+		if k > 0:
+			pass
+		else:
+			# Add node n and add edges to all other nodes based on weight_fun
+			self.G.add_node(self.n, pos=pos, d=dep_time, buyer=buyer)
+			nodes_to_connect = self.seller_nodes if buyer else self.buyer_nodes
 
-		for node in nodes_to_connect:
-			node_pos = self.G.nodes[node]['pos']
-			node_d = self.G.nodes[node]['d']
-			buyer_pos, buyer_d   = (pos, dep_time) if buyer else (node_pos, node_d)
-			seller_pos, seller_d = (node_pos, node_d) if buyer else (pos, dep_time)
-			self.G.add_edge(self.t, node, weight=
-							self.weight_func(buyer_pos, buyer_d, seller_pos, seller_d))
+			for node in nodes_to_connect:
+				node_pos = self.G.nodes[node]['pos']
+				node_d = self.G.nodes[node]['d']
+				buyer_pos, buyer_d   = (pos, dep_time) if buyer else (node_pos, node_d)
+				seller_pos, seller_d = (node_pos, node_d) if buyer else (pos, dep_time)
+				self.G.add_edge(self.t, node, weight=
+								self.weight_func(buyer_pos, buyer_d, seller_pos, seller_d))
 
-		# Keep track if new node is buyer or seller
-		if buyer: self.buyer_nodes.add(self.n) 
-		else: self.seller_nodes.add(self.n)
+			# Keep track if new node is buyer or seller
+			if buyer: self.buyer_nodes.add(self.n) 
+			else: self.seller_nodes.add(self.n)
 				
 
 
@@ -136,6 +141,8 @@ class simulator:
 		# Removes nodes
 		self.G.remove_nodes_from(nodes_to_remove)
 
+		## TODO: Add nodes in queue 
+
 		# Recalc weights if flagged
 		#  Iterates over buyers' edges; buyers are not connected to other buyers
 		if recalc_weights:
@@ -143,8 +150,6 @@ class simulator:
 				for seller in self.G.neighbors(buyer):
 					new_weight = self.weight_func(buyer.pos, buyer.d, seller.pos, seller.d)
 					self.G[buyer, seller]['weight'] = new_weight
-
-
 
 
 

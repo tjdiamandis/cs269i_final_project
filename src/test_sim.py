@@ -18,9 +18,9 @@ def weight_function(buyer_pos, buyer_d, seller_pos, seller_d):
 	sx, sy = seller_pos
 	return (bx-sx)**2 + (by-sy)**2
 
-N = 10
 
-sim = simulator(N, weight_function)
+
+sim = simulator(weight_function)
 sim.add_node((0,0),2, True)
 sim.add_node((0,0),2, False)
 print(sim.G.nodes.items())

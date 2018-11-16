@@ -28,12 +28,12 @@ class simulator:
 	The market is represented as a bipartite NetworkX graph
 	- Nodes are either buyers or sellers
 	- weights are calculated between the nodes as a function of position and 
-		departure time of both nodes
+	  departure time of both nodes
 
 	Instance variables:
 		t  			: current timestep (starts at 0)
 		n  			: index of last added node (starts at -1)
-		G  			: graph containing state of market
+		G  			: graph containing state of market (access this for running algorithms)
 		weight_func : weight function for caluclating edge weights 
 		buyer_nodes : list of buyer nodes in market
 		seller_nodes: list of seller noes in market
@@ -42,7 +42,7 @@ class simulator:
 		__init__ : initializes
 		add_node : adds a node to the graph with a given position & departure time
 		advance  : advances the market forward one step in time
-
+	 ** Refer to individual function documentation for more information **
 
 	Simulation:
 	1. Initialtize the simulator:
@@ -50,12 +50,28 @@ class simulator:
 	2. At each time step
 		i. Add node:
 			sim.add_node(pos_tuple, dep_time)
-		ii. Advance time t -> t+1
+		ii. Run algorithms to fulfill your heart's desire
+		iii. Advance time t -> t+1
 			sim.advance(update_weights=False)
 
-	Look at test_sim.py for usage examples
+	Timer Mechanics:
+	Ex. I add a node x at time t = 1 with d = 2
+		- time 1: x.d = 2
+		- advance()
+		- time 2: x.d = 1
+		- advance() # Removes x from market
+		- time 3: x no longer in market
 
-	Refer to individual function documentation for more information
+	Ex. I add a node x at time t = 1 with k = 2, d = 1
+		- time 1: x.k = 2, x.d = 1
+		- advance()
+		- time 2: x.k = 1, x.d = 1
+		- advance() # Places x into market
+		- time 3: x.k = 0, x.d = 1  (x in market)
+		- advance() # Removes x from market
+		- time 4: x no longer in market
+
+	See test_sim.py for usage examples
     """
 
 	def __init__(self, weight_func):
@@ -63,7 +79,7 @@ class simulator:
 		
 		Args:
 			weight_func (function)	: function specifying how pairwise weights should be calculated
-				Expected form of weight_func: weight_func(buyer_pos, buyer_d, seller_pos, seller_d)
+			  * Expected form of weight_func: weight_func(buyer_pos, buyer_d, seller_pos, seller_d)
 		"""
 		self.t = 0							# time step
 		self.n = -1	 						# index of last added node
@@ -78,18 +94,15 @@ class simulator:
 		
 		Args:
 			pos (tup: (dbl, dbl)) : (x,y) position of node
-			dep_time (int)		  : number of advances until node leaves market
+			dep_time (int)		  : number of advances until node exits market (rmvd. on d'th advance)
 			buyer (bool)          : True = buyer, False = seller
+			k (int)				  : steps to wait until node added to market (see ex in class desc)
 		"""
 
 		# Update node counter
-		#	Should equal current time step (add node t at time t)
 		self.n += 1
-		if not (self.n == self.t):
-			print("WARNING: at time {}, but node {} added"
-					.format(self.t,self.n))
 
-		# Flags node if not yet present, but still adds edges
+		# Flags node if not yet present (in future state of market), but still adds edges
 		in_market = False if k > 0 else True
 
 		# Add node n and add edges to all other nodes based on weight_fun
@@ -112,8 +125,10 @@ class simulator:
 
 	def advance(self, recalc_weights=False):
 		"""Advances the market by one step in time
-			- Decrements departure time counter of all nodes
-			- Removes nodes where departure_time(node) = 0
+			- Decrements departure time counter of all nodes in market
+				- Removes nodes where departure_time(node) = 0
+			- Decrements wait time counter of all nodes yet to be added
+				- Adds nodes where wait_time(node) = 0
 			- Recalculates weights (if flag)
 		
 		Args:
@@ -150,14 +165,16 @@ class simulator:
 		# Removes nodes
 		self.G.remove_nodes_from(nodes_to_remove)
 
-		## TODO: Add nodes in queue
-
 		# Recalc weights if flagged
 		#  Iterates over buyers' edges; buyers are not connected to other buyers
 		if recalc_weights:
 			for buyer in self.buyer_nodes:
+				buyer_pos = self.G.nodes[buyer]['pos']
+				buyer_d   = self.G.nodes[buyer]['d']
 				for seller in self.G.neighbors(buyer):
-					new_weight = self.weight_func(buyer.pos, buyer.d, seller.pos, seller.d)
+					seller_pos = self.G.nodes[seller]['pos']
+					seller_d   = self.G.nodes[seller]['d']
+					new_weight = self.weight_func(buyer_pos, buyer_d, seller_pos, seller_d)
 					self.G[buyer, seller]['weight'] = new_weight
 
 

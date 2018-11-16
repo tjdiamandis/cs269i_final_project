@@ -12,8 +12,7 @@ import networkx as nx
 OPEN TODOS:
 ************************************************************************
 TODO:
-- List of nodes to be added
-	- When you add a node, specify that it will be added in k time steps?
+- Documentation lol
 
 Questions:
 - Should only one node come on at each time step?
@@ -90,25 +89,24 @@ class simulator:
 			print("WARNING: at time {}, but node {} added"
 					.format(self.t,self.n))
 
-		## TODO: Store node in queue if to be added in the future
-		if k > 0:
-			pass
-		else:
-			# Add node n and add edges to all other nodes based on weight_fun
-			self.G.add_node(self.n, pos=pos, d=dep_time, buyer=buyer)
-			nodes_to_connect = self.seller_nodes if buyer else self.buyer_nodes
+		# Flags node if not yet present, but still adds edges
+		in_market = False if k > 0 else True
 
-			for node in nodes_to_connect:
-				node_pos = self.G.nodes[node]['pos']
-				node_d = self.G.nodes[node]['d']
-				buyer_pos, buyer_d   = (pos, dep_time) if buyer else (node_pos, node_d)
-				seller_pos, seller_d = (node_pos, node_d) if buyer else (pos, dep_time)
-				self.G.add_edge(self.t, node, weight=
-								self.weight_func(buyer_pos, buyer_d, seller_pos, seller_d))
+		# Add node n and add edges to all other nodes based on weight_fun
+		self.G.add_node(self.n, pos=pos, d=dep_time, buyer=buyer, in_market=in_market, k=k)
+		nodes_to_connect = self.seller_nodes if buyer else self.buyer_nodes
 
-			# Keep track if new node is buyer or seller
-			if buyer: self.buyer_nodes.add(self.n) 
-			else: self.seller_nodes.add(self.n)
+		for node in nodes_to_connect:
+			node_pos = self.G.nodes[node]['pos']
+			node_d = self.G.nodes[node]['d']
+			buyer_pos, buyer_d   = (pos, dep_time) if buyer else (node_pos, node_d)
+			seller_pos, seller_d = (node_pos, node_d) if buyer else (pos, dep_time)
+			self.G.add_edge(self.t, node, weight=
+							self.weight_func(buyer_pos, buyer_d, seller_pos, seller_d))
+
+		# Keep track if new node is buyer or seller
+		if buyer: self.buyer_nodes.add(self.n) 
+		else: self.seller_nodes.add(self.n)
 				
 
 
@@ -120,28 +118,39 @@ class simulator:
 		
 		Args:
 			recalc_weights (bool): If true, recalculates all weights in graph
-								   after counter is decremented
+								   after counter is decremented. Use if function of dep. times
 		"""
 
 		# Increment time counter
 		self.t += 1
 
-		# Update deadlines of nodes in the market
+		# Update deadlines of all nodes (in market + to be added)
 		nodes_to_remove = []
 		for node in self.G.nodes.items():
-			# Tags nodes for removal when departure timer goes to 0
-			dep_time = node[1]['d']
-			if dep_time > 1:
-				node[1]['d'] -=1
+			# Nodes in market:
+			#  - decrements dep. timer
+			#  - tags nodes for removal when departure timer equals 0
+			if node[1]['in_market']:
+				dep_time = node[1]['d']
+				if dep_time > 1:
+					node[1]['d'] -=1
+				else:
+					nodes_to_remove.append(node[0])
+					self.buyer_nodes.discard(node[0])
+					self.seller_nodes.discard(node[0])
+
+			# Nodes not yet in market:
+			#  - decrements wait timer
+			#  - add to market when wait timer equals 0
 			else:
-				nodes_to_remove.append(node[0])
-				self.buyer_nodes.discard(node[0])
-				self.seller_nodes.discard(node[0])
+				node[1]['k'] -= 1
+				if node[1]['k'] < 1:
+					node[1]['in_market'] = True
 
 		# Removes nodes
 		self.G.remove_nodes_from(nodes_to_remove)
 
-		## TODO: Add nodes in queue 
+		## TODO: Add nodes in queue
 
 		# Recalc weights if flagged
 		#  Iterates over buyers' edges; buyers are not connected to other buyers

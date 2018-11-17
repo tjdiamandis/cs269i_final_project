@@ -1,4 +1,4 @@
-from simulator import simulator
+from simulator import Simulator
 
 """
 ************************************************************************
@@ -29,7 +29,7 @@ def basic_tests():
 
 
 	# Test adding nodes and edges, timeout after d steps
-	sim = simulator(weight_function)
+	sim = Simulator(weight_function)
 	sim.add_node(pos=(0,0), d=2, buyer=True)
 	sim.add_node(pos=(1,1), d=2, buyer=False)
 	sim.print_all()
@@ -52,7 +52,7 @@ def basic_tests():
 
 # Test for when we want to update weights based on departure time
 def test_dynamic_weights():
-	
+
 	# Use a distance squared weight function with dependence on buyer's departure time
 	def weight_function_d(buyer_pos, buyer_d, seller_pos, seller_d):
 		bx, by = buyer_pos
@@ -60,7 +60,7 @@ def test_dynamic_weights():
 		return ((bx-sx)**2 + (by-sy)**2) / buyer_d / seller_d
 
 	# Test recalculating weight function (function of dep. time)
-	sim = simulator(weight_function_d)
+	sim = Simulator(weight_function_d)
 	sim.print_all()
 	sim.add_node(pos=(0,0), d=2, buyer=True)
 	sim.add_node(pos=(1,1), d=2, buyer=False)
@@ -81,7 +81,7 @@ def test_dynamic_weights():
 
 # Test for basic look ahead functionality
 def test_look_ahead():
-	
+
 	# Use a distance squared weight function with dependence on buyer's departure time
 	def weight_function_d(buyer_pos, buyer_d, seller_pos, seller_d):
 		bx, by = buyer_pos
@@ -89,7 +89,7 @@ def test_look_ahead():
 		return ((bx-sx)**2 + (by-sy)**2) / buyer_d / seller_d
 
 	# Test recalculating weight function (function of dep. time)
-	sim = simulator(weight_function_d)
+	sim = Simulator(weight_function_d)
 	sim.print_all()
 	sim.add_node(pos=(0,0), d=3, buyer=True, k=1)
 	sim.add_node(pos=(1,1), d=3, buyer=False, k=2)
@@ -97,14 +97,13 @@ def test_look_ahead():
 	sim.advance(recalc_weights=True)
 	sim.print_all()
 	sim.advance(recalc_weights=True)
-	sim.print_all()	
+	sim.print_all()
 	sim.advance(recalc_weights=True)
-	sim.print_all()	
+	sim.print_all()
 	sim.advance(recalc_weights=True)
-	sim.print_all()	
+	sim.print_all()
 
 
 
 if __name__ == "__main__":
 	main()
-

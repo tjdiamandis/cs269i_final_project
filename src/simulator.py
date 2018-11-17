@@ -6,13 +6,14 @@ Last Modified: Nov 15, 2018
 
 import networkx as nx
 
-
 """
 ************************************************************************
 OPEN TODOS:
 ************************************************************************
 TODO:
--
+- REMOVE_MATCHING
+  - when algorithm computes a list of matchings to create, we must remove them
+    from the graph
 
 Questions:
 - Should only one node come on at each time step?
@@ -22,7 +23,7 @@ Questions:
 """
 
 
-class simulator:
+class Simulator:
 	"""Simulates Ride Sharing Market
 
 	The market is represented as a bipartite NetworkX graph
@@ -40,6 +41,7 @@ class simulator:
 
 	Functions:
 		__init__ : initializes
+		reset  	 : reset the graph.
 		add_node : adds a node to the graph with a given position & departure time
 		advance  : advances the market forward one step in time
 		print_all: see what's going on (nodes, edges, who is buying, who is selling, etc)
@@ -89,6 +91,15 @@ class simulator:
 		self.buyer_nodes = set()			# list of buyer nodes
 		self.seller_nodes = set()			# list of seller nodes
 
+	def reset(self):
+		"""
+		Resets everything except for the weight function
+		"""
+		self.t = 0
+		self.n = -1
+		self.G.clear()
+		self.buyer_nodes.clear()
+		self.seller_nodes.clear()
 
 	def add_node(self, pos, d, buyer, k=0):
 		"""Adds node to the market (buyer or seller)
@@ -132,7 +143,14 @@ class simulator:
 		else:
 			self.seller_nodes.add(self.n)
 
-
+	def remove_matching(self, match):
+		"""
+		Input:
+		  match - (buyer, seller) pair
+		Output:
+		  weight of the match
+		"""
+		pass
 
 	def advance(self, recalc_weights=False):
 		"""Advances the market by one step in time
@@ -144,7 +162,7 @@ class simulator:
 
 		Args:
 			recalc_weights (bool): If true, recalculates all weights in graph
-								   after counter is decremented. Use if function of dep. times
+				after counter is decremented. Use if function of dep. times
 		"""
 
 		# Increment time counter

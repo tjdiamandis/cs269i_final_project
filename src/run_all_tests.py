@@ -1,5 +1,5 @@
 
-from tests import test_sim, test_algs
+from tests import test_sim, test_algs, test_interface
 
 if __name__ == "__main__":
     print("Testing simulator")
@@ -7,3 +7,6 @@ if __name__ == "__main__":
 
     print("\nTesting algorithms")
     test_algs.test_all()
+
+    print("\nTesting interface")
+    test_interface.test_interface()

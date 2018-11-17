@@ -89,12 +89,12 @@ class simulator:
 		self.seller_nodes = set()			# list of seller nodes
 
 
-	def add_node(self, pos, dep_time, buyer, k=0):
+	def add_node(self, pos, d, buyer, k=0):
 		"""Adds node to the market (buyer or seller)
 		
 		Args:
 			pos (tup: (dbl, dbl)) : (x,y) position of node
-			dep_time (int)		  : number of advances until node exits market (rmvd. on d'th advance)
+			d (int)		  		  : number of advances until node exits market (rmvd. on d'th advance)
 			buyer (bool)          : True = buyer, False = seller
 			k (int)				  : steps to wait until node added to market (see ex in class desc)
 		"""
@@ -106,16 +106,19 @@ class simulator:
 		in_market = False if k > 0 else True
 
 		# Add node n and add edges to all other nodes based on weight_fun
-		self.G.add_node(self.n, pos=pos, d=dep_time, buyer=buyer, in_market=in_market, k=k)
+		self.G.add_node(self.n, pos=pos, d=d, buyer=buyer, in_market=in_market, k=k)
 		nodes_to_connect = self.seller_nodes if buyer else self.buyer_nodes
 
+		# Always adds edge buyer -> seller
 		for node in nodes_to_connect:
 			node_pos = self.G.nodes[node]['pos']
 			node_d = self.G.nodes[node]['d']
-			buyer_pos, buyer_d   = (pos, dep_time) if buyer else (node_pos, node_d)
-			seller_pos, seller_d = (node_pos, node_d) if buyer else (pos, dep_time)
-			self.G.add_edge(self.t, node, weight=
-							self.weight_func(buyer_pos, buyer_d, seller_pos, seller_d))
+			buyer_pos, buyer_d   = (pos, d) if buyer else (node_pos, node_d)
+			seller_pos, seller_d = (node_pos, node_d) if buyer else (pos, d)
+			buyer, seller = (self.n, node) if buyer else (node, self.n)
+			self.G.add_edge(self.n, node, weight=
+							self.weight_func(buyer_pos=buyer_pos, buyer_d=buyer_d, 
+											 seller_pos=seller_pos, seller_d=seller_d))
 
 		# Keep track if new node is buyer or seller
 		if buyer: self.buyer_nodes.add(self.n) 
@@ -174,10 +177,48 @@ class simulator:
 				for seller in self.G.neighbors(buyer):
 					seller_pos = self.G.nodes[seller]['pos']
 					seller_d   = self.G.nodes[seller]['d']
-					new_weight = self.weight_func(buyer_pos, buyer_d, seller_pos, seller_d)
-					self.G[buyer, seller]['weight'] = new_weight
+					new_weight = self.weight_func(buyer_pos=buyer_pos, buyer_d=buyer_d, 
+											 seller_pos=seller_pos, seller_d=seller_d)
+					self.G[buyer][seller]['weight'] = new_weight
 
 
+
+	# Utility Functions
+	def print_nodes(self):
+		"""Prints nodes
+		"""
+		not_in_market = set()
+
+		print("\nNodes in market:")
+		for node in self.G.nodes.items():
+			if node[1]['in_market']:
+				print(node)
+			else:
+				not_in_market.add(node)
+
+		if len(not_in_market) > 0:
+			print("\nNodes not yet in market")
+			for node in not_in_market:
+				print(node)
+
+
+	def print_edges(self):
+		"""Prints edges
+		"""
+		not_in_market = set()
+
+		print("\nEdges in market:")
+		for edge in self.G.edges.items():
+			nodes, attr = edge
+			if self.G.nodes[nodes[0]]['in_market'] and self.G.nodes[nodes[1]]['in_market']:
+				print(edge)
+			else:
+				not_in_market.add(edge)
+
+		if len(not_in_market) > 0:
+			print("\nEdges not yet in market")
+			for edge in not_in_market:
+				print(edge)
 
 # ****************************************************************
 # Needs:

@@ -7,3 +7,6 @@ Derek, Emil, Georgia, Theo
 
 ## Related Paper:
 https://arxiv.org/abs/1808.03526
+
+## Miscellaneous
+.gitignore from: https://github.com/github/gitignore/blob/master/Python.gitignore

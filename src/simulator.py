@@ -12,7 +12,7 @@ import networkx as nx
 OPEN TODOS:
 ************************************************************************
 TODO:
-- Documentation lol
+- 
 
 Questions:
 - Should only one node come on at each time step?
@@ -42,6 +42,7 @@ class simulator:
 		__init__ : initializes
 		add_node : adds a node to the graph with a given position & departure time
 		advance  : advances the market forward one step in time
+		print_all: see what's going on (nodes, edges, who is buying, who is selling, etc)
 	 ** Refer to individual function documentation for more information **
 
 	Simulation:
@@ -109,20 +110,20 @@ class simulator:
 		self.G.add_node(self.n, pos=pos, d=d, buyer=buyer, in_market=in_market, k=k)
 		nodes_to_connect = self.seller_nodes if buyer else self.buyer_nodes
 
-		# Always adds edge buyer -> seller
 		for node in nodes_to_connect:
 			node_pos = self.G.nodes[node]['pos']
 			node_d = self.G.nodes[node]['d']
 			buyer_pos, buyer_d   = (pos, d) if buyer else (node_pos, node_d)
 			seller_pos, seller_d = (node_pos, node_d) if buyer else (pos, d)
-			buyer, seller = (self.n, node) if buyer else (node, self.n)
 			self.G.add_edge(self.n, node, weight=
 							self.weight_func(buyer_pos=buyer_pos, buyer_d=buyer_d, 
 											 seller_pos=seller_pos, seller_d=seller_d))
 
 		# Keep track if new node is buyer or seller
-		if buyer: self.buyer_nodes.add(self.n) 
-		else: self.seller_nodes.add(self.n)
+		if buyer: 
+			self.buyer_nodes.add(self.n) 
+		else: 
+			self.seller_nodes.add(self.n)
 				
 
 
@@ -189,7 +190,7 @@ class simulator:
 		"""
 		not_in_market = set()
 
-		print("\nNodes in market:")
+		print("Nodes in market: (total market + to be added: " + str(len(self.G.nodes)) + ")")
 		for node in self.G.nodes.items():
 			if node[1]['in_market']:
 				print(node)
@@ -207,7 +208,7 @@ class simulator:
 		"""
 		not_in_market = set()
 
-		print("\nEdges in market:")
+		print("Edges in market: (total market + to be added: " + str(len(self.G.edges)).strip() + ")")
 		for edge in self.G.edges.items():
 			nodes, attr = edge
 			if self.G.nodes[nodes[0]]['in_market'] and self.G.nodes[nodes[1]]['in_market']:
@@ -219,6 +220,15 @@ class simulator:
 			print("\nEdges not yet in market")
 			for edge in not_in_market:
 				print(edge)
+
+	def print_all(self):
+		"""Prints buyer and sellers, nodes & edges
+		"""
+		print("\nTimestep: ", str(self.t))
+		print("Buyers: " + str(self.buyer_nodes))
+		print("Sellers: " + str(self.seller_nodes))
+		self.print_nodes()
+		self.print_edges()
 
 # ****************************************************************
 # Needs:

@@ -230,11 +230,11 @@ class simulator:
 		self.print_nodes()
 		self.print_edges()
 
+
 # ****************************************************************
-# Needs:
+# Needs: (DONE)
 # ****************************************************************
 # - Graph with weights ~ to some function of (distance, etc) [can be changed] - DONE
 # - Distribution of departure times baked into model - DONE, specified outside
-# - "Look ahead" - keep track of nodes yet to be added
-# 	-- queue of nodes to be added of length look_ahead_n
+# - "Look ahead" - keep track of nodes yet to be added - DONE
 # ****************************************************************

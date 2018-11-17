@@ -108,15 +108,3 @@ def test_look_ahead():
 if __name__ == "__main__":
 	main()
 
-
-# def add_node(self, pos, d, buyer, k=0):
-# 	"""Adds node to the market (buyer or seller)
-	
-# 	Args:
-# 		pos (tup: (dbl, dbl)) : (x,y) position of node
-# 		d (int)		  		  : number of advances until node exits market (rmvd. on d'th advance)
-# 		buyer (bool)          : True = buyer, False = seller
-# 		k (int)				  : steps to wait until node added to market (see ex in class desc)
-# 	"""
-
-# 	# Update node counter

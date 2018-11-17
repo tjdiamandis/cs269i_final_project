@@ -190,7 +190,7 @@ class simulator:
 		"""
 		not_in_market = set()
 
-		print("Nodes in market: (total market + to be added: " + str(len(self.G.nodes)) + ")")
+		print("Nodes in market: (total in market + to be added: " + str(len(self.G.nodes)) + ")")
 		for node in self.G.nodes.items():
 			if node[1]['in_market']:
 				print(node)
@@ -208,7 +208,7 @@ class simulator:
 		"""
 		not_in_market = set()
 
-		print("Edges in market: (total market + to be added: " + str(len(self.G.edges)).strip() + ")")
+		print("Edges in market: (total in market + to be added: " + str(len(self.G.edges)).strip() + ")")
 		for edge in self.G.edges.items():
 			nodes, attr = edge
 			if self.G.nodes[nodes[0]]['in_market'] and self.G.nodes[nodes[1]]['in_market']:

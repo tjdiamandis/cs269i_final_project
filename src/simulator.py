@@ -143,14 +143,19 @@ class Simulator:
 		else:
 			self.seller_nodes.add(self.n)
 
-	def remove_matching(self, match):
+	def remove_matching(self, buyer_i, seller_i):
 		"""
 		Input:
 		  match - (buyer, seller) pair
+		  buyer, seller are the indexes into self.G.nodes
 		Output:
 		  weight of the match
 		"""
-		pass
+		assert self.G.nodes[buyer_i]['in_market'] and self.G.nodes[seller_i]['in_market']
+		assert self.G.nodes[buyer_i]['d'] > 0 and self.G.nodes[seller_i]['d'] > 0
+		self.buyer_nodes.discard(buyer_i)
+		self.seller_nodes.discard(seller_i)
+		self.G.remove_nodes_from([buyer_i, seller_i])
 
 	def advance(self, recalc_weights=False):
 		"""Advances the market by one step in time

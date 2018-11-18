@@ -12,10 +12,10 @@ TODO:
 """
 
 def main():
-	# basic_tests()
-	# test_dynamic_weights()
+	basic_tests()
+	test_dynamic_weights()
 	test_look_ahead()
-
+	test_removal()
 
 
 # Basic functionality
@@ -103,7 +103,20 @@ def test_look_ahead():
 	sim.advance(recalc_weights=True)
 	sim.print_all()
 
+def weight_function(buyer_pos, buyer_d, seller_pos, seller_d):
+	bx, by = buyer_pos
+	sx, sy = seller_pos
+	return (bx-sx)**2 + (by-sy)**2
 
+def test_removal():
+	sim = Simulator(weight_function)
+	sim.add_node(pos=(-1,-2), d=1, buyer=True)
+	sim.add_node(pos=(-1,-2), d=1, buyer=False)
+	print("Before removing:")
+	sim.print_all()
+	sim.remove_matching(sim.n-1, sim.n)
+	print("After removing")
+	sim.print_all()
 
 if __name__ == "__main__":
 	main()

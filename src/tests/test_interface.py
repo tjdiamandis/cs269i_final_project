@@ -9,8 +9,14 @@ import algs
 def test_interface():
     A = time.time()
     def weight_func(buyer_pos, buyer_d, seller_pos, seller_d):
-        return 1
-    interface.Interface(algs.PostponedGreedy(), simulator.Simulator(weight_func))
+        return abs(buyer_pos[0] - seller_pos[0])
+    inter = interface.Interface(
+        algs.greedy.Greedy(),
+        simulator.Simulator(weight_func),
+        seed=42,
+        dep_distr=(3,0), # to make d constant for all nodes, make variance 0 (duh)
+        verbose=True)
+    inter.run(10)
     B = time.time()
     print("Interface tests completed successfully in {} sec".format(B - A))
 

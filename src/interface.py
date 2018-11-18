@@ -44,19 +44,21 @@ class Interface:
         weights = []
         for i in range(num_steps):
             node_added = self._maybe_add_node()
-            if node_added and verbose:
+            if node_added and self.verbose:
                 print("Added a node at step ", i)
-            matchings = self.algorithm.compute_matching(self.sim)
+            matchings = self.max_weight_alg.compute_matching(self.sim)
             for match in matchings:
-                weights.append(self.sim.remove_matching(match))
+                weights.append(self.sim.remove_matching(match[0], match[1]))
             self.sim.advance() # includes adding a node?
         return weights
 
     def _maybe_add_node(self):
         if np.random.uniform(0,1) > self.p_node: return False
-        pos_x = np.random.uniform(0, self.size[0])
-        pos_y = np.random.uniform(0, self.size[1])
+        pos_x = round(np.random.uniform(0, self.size[0]))
+        pos_y = round(np.random.uniform(0, self.size[1]))
         d = round(np.random.normal(self.d_mean, self.d_var))
         is_buyer = True if np.random.uniform(0,1) <= self.p_buyer else False
         self.sim.add_node((pos_x, pos_y), d, is_buyer, k=0)
+        if self.verbose:
+            print("Node: ({},{}), {}, {}".format(pos_x,pos_y,d,is_buyer))
         return True

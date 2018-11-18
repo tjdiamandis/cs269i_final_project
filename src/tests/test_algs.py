@@ -107,11 +107,35 @@ def test_dfa():
             time.time() - A)
     )
 
+def test_batching():
+    A = time.time()
+    simple_test_cases(algs.batching.BatchingAlgorithm(
+        algs.greedy.Greedy(),
+        batch=1)
+    )
+    print("Batched Greedy tests completed successfully in {} sec".format(time.time() - A))
+    A = time.time()
+    simple_test_cases(algs.batching.BatchingAlgorithm(
+        algs.deferred.DynamicDeferredAcceptance(),
+        batch=1)
+    )
+
+    batch_alg = algs.batching.BatchingAlgorithm(algs.greedy.Greedy(), batch=2)
+    A = time.time()
+    sim = simulator.Simulator(weight_function)
+    sim.add_node(pos=(0,0), d=2, buyer=True)
+    sim.add_node(pos=(1,1), d=2, buyer=False)
+    assert [(0,1)] == batch_alg.compute_matching(sim)
+    print(
+        "Batch != 1 Batched Greedy test completed successfully in {} sec".format(
+            time.time() - A)
+    )
 
 def test_all():
     test_abstract()
     test_greedy()
     test_dfa()
+    test_batching()
 
 
 if __name__ == "__main__":

@@ -158,8 +158,9 @@ class Simulator:
 		self.seller_nodes.discard(seller_i)
 		self.G.remove_nodes_from([buyer_i, seller_i])
 
-	def is_critical(self, node_index):
-		return self.G.nodes[node_index]['d'] == 1
+	def is_critical(self, node_index, critical_at=1):
+        # critical_at used for batching.
+		return self.G.nodes[node_index]['d'] == critical_at
 
 	def advance(self, recalc_weights=False):
 		"""Advances the market by one step in time

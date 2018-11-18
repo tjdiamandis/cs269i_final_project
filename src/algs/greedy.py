@@ -11,6 +11,8 @@ class Greedy(OnlineWeightMatchingAlgorithm):
         # self.p is seller_index -> to -> value
         self.m = dict() # matches (index)
         # self.m is seller_index -> to -> matched_buyer_index
+        self.critical_at = 1
+        # needed for batching.
 
     def compute_matching(self, sim):
         """
@@ -55,7 +57,7 @@ class Greedy(OnlineWeightMatchingAlgorithm):
         for node_index in range(sim.n + 1):
             # not iterating over sellers set because order matters
             if node_index in sim.seller_nodes:
-                if sim.is_critical(node_index) and node_index in self.m:
+                if sim.is_critical(node_index, self.critical_at) and node_index in self.m:
                     matchings_reversed[self.m[node_index]] = node_index
         return [(buyer, seller) for buyer, seller in matchings_reversed.items()]
 

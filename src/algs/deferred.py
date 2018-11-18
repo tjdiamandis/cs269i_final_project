@@ -15,6 +15,8 @@ class DynamicDeferredAcceptance(OnlineWeightMatchingAlgorithm):
         self.eps = 1e-3
         # for the ascending auction to ensure termination
         # Algorithmic analysis in the paper was conducted with self.eps -> 0
+        self.critical_at = 1
+        # needed for batching.
 
     def compute_matching(self, sim):
         """
@@ -69,7 +71,7 @@ class DynamicDeferredAcceptance(OnlineWeightMatchingAlgorithm):
         for node_index in range(sim.n + 1):
             # not iterating over sellers set because order matters
             if node_index in sim.seller_nodes:
-                if sim.is_critical(node_index) and node_index in self.matching_s:
+                if sim.is_critical(node_index, self.critical_at) and node_index in self.matching_s:
                     matchings_reversed[self.matching_s[node_index]] = node_index
         return [(buyer, seller) for buyer, seller in matchings_reversed.items()]
 

@@ -6,6 +6,7 @@ class BatchingAlgorithm(OnlineWeightMatchingAlgorithm):
             max_weight_matching,
             batch=5):
         self.max_weight_alg = max_weight_matching
+        self.max_weight_alg.critical_at = batch
         self.batch = batch # make this d + 1
 
     def compute_matching(self, sim):

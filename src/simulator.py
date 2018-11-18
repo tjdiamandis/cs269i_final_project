@@ -11,9 +11,8 @@ import networkx as nx
 OPEN TODOS:
 ************************************************************************
 TODO:
-- REMOVE_MATCHING
-  - when algorithm computes a list of matchings to create, we must remove them
-    from the graph
+- Ensure consistency with paper
+  - Do buyers leave when critical? Neither alg deals with critical buyers.
 
 Questions:
 - Should only one node come on at each time step?

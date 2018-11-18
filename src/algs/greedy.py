@@ -16,9 +16,6 @@ class Greedy(OnlineWeightMatchingAlgorithm):
         """
         Input:
           Current state of the market. (from simulator)
-          - The market state may be different depending on the algorithm.
-            - For example, the Greedy Algorithm (3.1) requires a bipartite
-              constrained online graph, but it also has way of creating one... TODO
 
         Output:
           Matching: a list, of (buyer, seller) pairs.
@@ -26,21 +23,41 @@ class Greedy(OnlineWeightMatchingAlgorithm):
 
         """
         self._reset_internals()
-        matchings_reversed = {} # buyer : seller
+        self._process_buyers(sim)
+        return self._process_critical_sellers(sim)
+
+    def _process_buyers(self, sim):
+        """
+        Go through all buyer nodes in arrival order, matching a buyer to the
+        seller with the highest marginal value, if positive.
+        """
         for node_index in range(sim.n + 1):
-            # not iterating over buyers because order matters
+            # not iterating over buyers set because order matters
             assert sim.G.nodes[node_index]['in_market']
             if node_index in sim.buyer_nodes:
                 s, v_is = self._argmax(node_index, sim)
                 if v_is - self.p[s] > 0:
                     self.m[s] = node_index
                     self.p[s] = v_is
+
+
+    def _process_critical_sellers(self, sim):
+        """
+        Go through all seller nodes in arrival order, and make a matching for
+        the sellers that are 'critical'
+
+        Output:
+          Matching: a list, of (buyer, seller) pairs.
+            buyer and seller are indexes into sim.G for the appropriate node.
+
+        """
+        matchings_reversed = {} # buyer : seller
         for node_index in range(sim.n + 1):
-            # not iterating over buyers because order matters
+            # not iterating over sellers set because order matters
             if node_index in sim.seller_nodes:
                 if sim.is_critical(node_index) and node_index in self.m:
                     matchings_reversed[self.m[node_index]] = node_index
-        return [(seller, buyer) for buyer, seller in matchings_reversed.items()]
+        return [(buyer, seller) for buyer, seller in matchings_reversed.items()]
 
     def _reset_internals(self):
         self.p = defaultdict(float)
@@ -56,7 +73,4 @@ class Greedy(OnlineWeightMatchingAlgorithm):
                 best_s = s
         return (best_s, max_weight)
 
-
-class PostponedGreedy(OnlineWeightMatchingAlgorithm):
-    def __init__(self):
-        pass
+# Note: not exploring PostponedGreedy because we assume all buyers, sellers predefined

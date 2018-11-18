@@ -43,6 +43,8 @@ class Simulator:
 		__init__ : initializes
 		reset  	 : reset the graph.
 		add_node : adds a node to the graph with a given position & departure time
+		remove_matching: remove a (buyer, seller) pair
+		is_critical: return true if a node index is going critical (departure time 0)
 		advance  : advances the market forward one step in time
 		print_all: see what's going on (nodes, edges, who is buying, who is selling, etc)
 	 ** Refer to individual function documentation for more information **
@@ -157,6 +159,9 @@ class Simulator:
 		self.seller_nodes.discard(seller_i)
 		self.G.remove_nodes_from([buyer_i, seller_i])
 
+	def is_critical(self, node_index):
+		return self.G.nodes[node_index]['d'] == 1
+
 	def advance(self, recalc_weights=False):
 		"""Advances the market by one step in time
 			- Decrements departure time counter of all nodes in market
@@ -215,7 +220,7 @@ class Simulator:
 						seller_d=seller_d
 					)
 					self.G[buyer][seller]['weight'] = new_weight
-
+                    # TODO -- djp42 -- should this be self.G.edges?
 
 	# Utility Functions
 	def print_nodes(self):

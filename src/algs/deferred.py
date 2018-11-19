@@ -39,6 +39,7 @@ class DynamicDeferredAcceptance(OnlineWeightMatchingAlgorithm):
         """
         for node_index in range(sim.n + 1):
             # not iterating over buyers set because order matters
+            if node_index not in sim.G.nodes: continue # node has been removed
             assert sim.G.nodes[node_index]['in_market']
             if node_index in sim.buyer_nodes:
                 self._conduct_ascending_auction(sim, node_index)

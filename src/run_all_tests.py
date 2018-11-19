@@ -10,4 +10,4 @@ if __name__ == "__main__":
 
     print("\nTesting interface")
     # BROKEN
-    #test_interface.test_interface()
+    test_interface.test_interface()

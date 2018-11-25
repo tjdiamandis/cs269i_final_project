@@ -6,3 +6,4 @@ from algs.algorithms import *
 from algs.greedy import *
 from algs.batching import *
 from algs.deferred import *
+from algs.lookahead import *

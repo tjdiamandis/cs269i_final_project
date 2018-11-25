@@ -18,7 +18,7 @@ def test_abstract():
 def weight_function(buyer_pos, buyer_d, seller_pos, seller_d):
     bx, by = buyer_pos
     sx, sy = seller_pos
-    return 1/((bx-sx)**2 + (by-sy)**2 + 1)
+    return 1.0/((bx-sx)**2 + (by-sy)**2 + 1)
 
 def simple_test_cases(some_alg, verbose=False):
     A = time.time()

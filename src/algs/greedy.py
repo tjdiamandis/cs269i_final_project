@@ -36,7 +36,7 @@ class Greedy(OnlineWeightMatchingAlgorithm):
         for node_index in range(sim.n + 1):
             # not iterating over buyers set because order matters
             if node_index not in sim.G.nodes: continue # node has been removed
-            assert sim.G.nodes[node_index]['in_market']
+            # assert sim.G.nodes[node_index]['in_market']
             if node_index in sim.buyer_nodes:
                 s, v_is = self._argmax(node_index, sim)
                 if v_is - self.p[s] > 0:
@@ -70,10 +70,14 @@ class Greedy(OnlineWeightMatchingAlgorithm):
         best_s = -1
         max_weight = -100000
         for s in sim.seller_nodes:
-            w = sim.G.edges[(b,s)]['weight']
-            if w > max_weight:
-                max_weight = w
-                best_s = s
+            if self._valid_match(sim.G.nodes[s], sim.G.nodes[b]):
+                w = sim.G.edges[(b,s)]['weight']
+                if w > max_weight:
+                    max_weight = w
+                    best_s = s
         return (best_s, max_weight)
+
+    def _valid_match(self, s, b):
+        return s['in_market'] and b['in_market']
 
 # Note: not exploring PostponedGreedy because we assume all buyers, sellers predefined

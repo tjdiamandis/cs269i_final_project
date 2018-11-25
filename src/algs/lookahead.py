@@ -1,9 +1,9 @@
 from collections import defaultdict
 from algs.algorithms import OnlineWeightMatchingAlgorithm
 
-class DynamicDeferredAcceptance(OnlineWeightMatchingAlgorithm):
+class DeferredWithLookAhead(OnlineWeightMatchingAlgorithm):
     # See algorithm 4.
-    def __init__(self):
+    def __init__(self, la_thresh):
         self.price_s = defaultdict(float)
         # p from the algorithm is something like value
         # self.price_s is seller_index -> to -> value
@@ -17,6 +17,8 @@ class DynamicDeferredAcceptance(OnlineWeightMatchingAlgorithm):
         # Algorithmic analysis in the paper was conducted with self.eps -> 0
         self.critical_at = 1
         # needed for batching.
+        self.threshold = la_thresh
+        # Furthest look-ahead allowed
 
     def compute_matching(self, sim):
         """
@@ -48,7 +50,7 @@ class DynamicDeferredAcceptance(OnlineWeightMatchingAlgorithm):
         terminate = False
         b = node_index
         while not terminate:
-            s, self.marginal_profit_b[b] = self._argmax(b, sim)
+            s, self.marginal_profit_b[b] = self._argmax_given_k(b, sim)
             if self.marginal_profit_b[b] > 0:
                 prev_b = None
                 if s in self.matching_s:
@@ -81,7 +83,7 @@ class DynamicDeferredAcceptance(OnlineWeightMatchingAlgorithm):
         self.matching_s = dict()
         self.marginal_profit_b = defaultdict(float)
 
-    def _argmax(self, b, sim):
+    def _argmax_given_k(self, b, sim):
         best_s = -1
         max_profit = -100000
         for s in sim.seller_nodes:
@@ -94,4 +96,4 @@ class DynamicDeferredAcceptance(OnlineWeightMatchingAlgorithm):
         return (best_s, max_profit)
 
     def _valid_match(self, s, b):
-        return s['in_market'] and b['in_market']
+        return b['k'] <= self.threshold and s['k'] <= self.threshold and s['d'] > b['k']

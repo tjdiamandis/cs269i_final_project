@@ -61,7 +61,7 @@ class Interface:
         if np.random.uniform(0,1) > self.p_node: return False
         pos_x = round(np.random.uniform(0, self.size[0]))
         pos_y = round(np.random.uniform(0, self.size[1]))
-        d = round(np.random.normal(self.d_mean, self.d_var))
+        d = max(round(np.random.normal(self.d_mean, self.d_var)), 1)
         is_buyer = True if np.random.uniform(0,1) <= self.p_buyer else False
         self.sim.add_node((pos_x, pos_y), d, is_buyer, k=0)
         if self.verbose:

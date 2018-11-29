@@ -42,6 +42,8 @@ class Interface:
     def run(self, num_steps):
         self.sim.reset()
         weights = []
+        discarded_buyers = []
+        discarded_sellers = []
         for i in range(num_steps):
             node_added = self._maybe_add_node()
             if node_added and self.verbose:
@@ -49,9 +51,12 @@ class Interface:
             self.sim.print_all()
             matchings = self.max_weight_alg.compute_matching(self.sim)
             for match in matchings:
-                weights.append(self.sim.remove_matching(match[0], match[1]))
-            self.sim.advance() # includes adding a node?
-        return weights
+                weight = self.sim.remove_matching(match[0], match[1])
+                weights.append((weight, i))
+            removed_b, removed_s = self.sim.advance()
+            discarded_buyers.append((removed_b, i))
+            discarded_sellers.append((removed_s, i))
+        return weights, discarded_buyers, discarded_sellers
 
     def _maybe_add_node(self):
         if np.random.uniform(0,1) > self.p_node: return False

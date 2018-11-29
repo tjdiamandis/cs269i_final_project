@@ -1,4 +1,3 @@
-
 from tests import test_sim, test_algs, test_interface
 
 if __name__ == "__main__":
@@ -9,5 +8,4 @@ if __name__ == "__main__":
     test_algs.test_all()
 
     print("\nTesting interface")
-    # BROKEN
     test_interface.test_interface()

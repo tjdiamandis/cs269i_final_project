@@ -1,13 +1,15 @@
 import time
 import sys
 sys.path.append("..")
+sys.path.append("../algs/")
+
 import algs
 import simulator
 
 def test_abstract():
     A = time.time()
     try:
-        algs.algorithms.OnlineWeightMatchingAlgorithm()
+        algs.OnlineWeightMatchingAlgorithm()
     except NotImplementedError:
         B = time.time()
         print("Abstract tests completed successfully in {} sec.".format(B - A))
@@ -95,13 +97,13 @@ def simple_test_cases(some_alg, verbose=False):
 
 def test_greedy():
     A = time.time()
-    simple_test_cases(algs.greedy.Greedy())
+    simple_test_cases(algs.Greedy())
     print("Greedy tests completed successfully in {} sec".format(time.time() - A))
 
 
 def test_dfa():
     A = time.time()
-    simple_test_cases(algs.deferred.DynamicDeferredAcceptance(), verbose = True)
+    simple_test_cases(algs.DynamicDeferredAcceptance(), verbose = True)
     print(
         "DynamicDeferredAcceptance tests completed successfully in {} sec".format(
             time.time() - A)
@@ -109,18 +111,18 @@ def test_dfa():
 
 def test_batching():
     A = time.time()
-    simple_test_cases(algs.batching.BatchingAlgorithm(
+    simple_test_cases(algs.BatchingAlgorithm(
         algs.greedy.Greedy(),
         batch=1)
     )
     print("Batched Greedy tests completed successfully in {} sec".format(time.time() - A))
     A = time.time()
-    simple_test_cases(algs.batching.BatchingAlgorithm(
+    simple_test_cases(algs.BatchingAlgorithm(
         algs.deferred.DynamicDeferredAcceptance(),
         batch=1)
     )
 
-    batch_alg = algs.batching.BatchingAlgorithm(algs.greedy.Greedy(), batch=2)
+    batch_alg = algs.BatchingAlgorithm(algs.greedy.Greedy(), batch=2)
     A = time.time()
     sim = simulator.Simulator(weight_function)
     sim.add_node(pos=(0,0), d=2, buyer=True)

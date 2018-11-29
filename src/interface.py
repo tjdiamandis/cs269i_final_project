@@ -48,7 +48,6 @@ class Interface:
             node_added = self._maybe_add_node()
             if node_added and self.verbose:
                 print("Added a node at step ", i)
-            self.sim.print_all()
             matchings = self.max_weight_alg.compute_matching(self.sim)
             for match in matchings:
                 weight = self.sim.remove_matching(match[0], match[1])

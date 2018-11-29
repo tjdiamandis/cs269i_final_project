@@ -111,10 +111,12 @@ def weight_function(buyer_pos, buyer_d, seller_pos, seller_d):
 def test_removal():
     sim = Simulator(weight_function)
     sim.add_node(pos=(-1,-2), d=1, buyer=True)
-    sim.add_node(pos=(-1,-2), d=1, buyer=False)
+    sim.add_node(pos=(-2,-2), d=1, buyer=False)
     print("Before removing:")
     sim.print_all()
-    sim.remove_matching(sim.n-1, sim.n)
+    weight = sim.remove_matching(sim.n-1, sim.n)
+    assert(weight == 1)
+
     print("After removing")
     sim.print_all()
     print("Test removed and recorded with advance")
@@ -124,5 +126,6 @@ def test_removal():
     removed_buyers, removed_sellers = sim.advance()
     assert(removed_buyers == 2)
     assert(removed_sellers == 1)
+
 if __name__ == "__main__":
     main()

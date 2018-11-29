@@ -156,7 +156,10 @@ class Simulator:
         assert self.G.nodes[buyer_i]['d'] > 0 and self.G.nodes[seller_i]['d'] > 0
         self.buyer_nodes.discard(buyer_i)
         self.seller_nodes.discard(seller_i)
+
+        weight = self.G.edges[buyer_i,seller_i]["weight"]
         self.G.remove_nodes_from([buyer_i, seller_i])
+        return weight
 
     def is_critical(self, node_index, critical_at=1):
         # critical_at used for batching.

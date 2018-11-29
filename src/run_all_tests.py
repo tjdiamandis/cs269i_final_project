@@ -8,5 +8,4 @@ if __name__ == "__main__":
     test_algs.test_all()
 
     print("\nTesting interface")
-    # BROKEN
     test_interface.test_interface()

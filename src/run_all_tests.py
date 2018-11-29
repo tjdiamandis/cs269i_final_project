@@ -1,4 +1,3 @@
-
 from tests import test_sim, test_algs, test_interface
 
 if __name__ == "__main__":

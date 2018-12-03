@@ -41,24 +41,30 @@ class Interface:
         if seed:
             np.random.seed(seed)
             if self.verbose: print("Random seed set to: ", seed)
+        self.node_original_wait_times = []
 
     def run(self, num_steps):
         self.sim.reset()
         weights = []
         discarded_buyers = []
         discarded_sellers = []
+        matched_wait_times = []
         for i in range(num_steps):
             node_added = self._maybe_add_node(self.min_to_add, self.max_to_add)
             if node_added and self.verbose:
-                print("Added a node at step ", i)
+                print("Added ", node_added, " nodes at step ", i)
             matchings = self.max_weight_alg.compute_matching(self.sim)
             for match in matchings:
                 weight = self.sim.remove_matching(match[0], match[1])
                 weights.append((weight, i))
+                matched_wait_times.append(
+                    (self.node_original_wait_times[match[0]],
+                     self.node_original_wait_times[match[1]])
+                )
             removed_b, removed_s = self.sim.advance()
             discarded_buyers.append((removed_b, i))
             discarded_sellers.append((removed_s, i))
-        return weights, discarded_buyers, discarded_sellers
+        return weights, discarded_buyers, discarded_sellers, matched_wait_times
 
     def _maybe_add_node(self, min_to_add, max_to_add):
         if np.random.randint(0,1) > self.p_node: return 0
@@ -71,6 +77,7 @@ class Interface:
             pos_x = round(np.random.uniform(0, self.size[0]))
             pos_y = round(np.random.uniform(0, self.size[1]))
             d = max(round(np.random.normal(self.d_mean, self.d_var)), 1)
+            self.node_original_wait_times.append(d)
             is_buyer = True if np.random.uniform(0,1) <= self.p_buyer else False
             self.sim.add_node((pos_x, pos_y), d, is_buyer, k=0)
             if self.verbose:

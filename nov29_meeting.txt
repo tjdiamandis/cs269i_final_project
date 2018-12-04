@@ -1,0 +1,25 @@
+Introduction
+
+Theory
+
+Simulation/Model Setup
+- Simulator & Model overview
+
+Algorithms Discussion
+- Summary of results from paper
+- 
+
+Results
+
+Model Limitations and Future Work
+
+
+Lookahead:
+- sellers entering and leaving rapidly
+- substantial look-ahead
+
+
+Weight function stochastically?
+
+Avg # of people in market
+

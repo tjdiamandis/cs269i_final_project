@@ -26,7 +26,8 @@ class Interface:
             size=(10,10),
             dep_distr=(3,1), # to make d constant for all nodes, make variance 0 (duh)
             seed=None,
-            verbose=False
+            verbose=False,
+            recalc_weights=False
     ):
         self.max_weight_alg = algorithm
         self.sim = sim
@@ -41,7 +42,7 @@ class Interface:
         if seed:
             np.random.seed(seed)
             if self.verbose: print("Random seed set to: ", seed)
-        self.node_original_wait_times = []
+        self.recalc_weights = recalc_weights
 
     def run(self, num_steps):
         self.sim.reset()
@@ -49,6 +50,8 @@ class Interface:
         discarded_buyers = []
         discarded_sellers = []
         matched_wait_times = []
+        self.node_original_wait_times = []
+
         for i in range(num_steps):
             node_added = self._maybe_add_node(self.min_to_add, self.max_to_add)
             if node_added and self.verbose:
@@ -61,7 +64,7 @@ class Interface:
                     (self.node_original_wait_times[match[0]],
                      self.node_original_wait_times[match[1]])
                 )
-            removed_b, removed_s = self.sim.advance()
+            removed_b, removed_s = self.sim.advance(self.recalc_weights)
             discarded_buyers.append((removed_b, i))
             discarded_sellers.append((removed_s, i))
         return weights, discarded_buyers, discarded_sellers, matched_wait_times

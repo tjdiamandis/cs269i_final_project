@@ -119,7 +119,7 @@ class Simulator:
         in_market = False if k > 0 else True
 
         # Add node n and add edges to all other nodes based on weight_fun
-        self.G.add_node(self.n, pos=pos, d=d, buyer=buyer, in_market=in_market, k=k)
+        self.G.add_node(self.n, pos=pos, d=d, buyer=buyer, in_market=in_market, k=k, added_at=self.t)
         nodes_to_connect = self.seller_nodes if buyer else self.buyer_nodes
 
         for node in nodes_to_connect:

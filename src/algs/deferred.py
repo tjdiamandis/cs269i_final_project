@@ -3,7 +3,7 @@ from algs.algorithms import OnlineWeightMatchingAlgorithm
 
 class DynamicDeferredAcceptance(OnlineWeightMatchingAlgorithm):
     # See algorithm 4.
-    def __init__(self):
+    def __init__(self, stochastic=False, guess=0):
         self.price_s = defaultdict(float)
         # p from the algorithm is something like value
         # self.price_s is seller_index -> to -> value
@@ -17,6 +17,8 @@ class DynamicDeferredAcceptance(OnlineWeightMatchingAlgorithm):
         # Algorithmic analysis in the paper was conducted with self.eps -> 0
         self.critical_at = 1
         # needed for batching.
+        self.stochastic = stochastic
+        self.guess = guess
 
     def compute_matching(self, sim):
         """
@@ -72,9 +74,17 @@ class DynamicDeferredAcceptance(OnlineWeightMatchingAlgorithm):
         for node_index in range(sim.n + 1):
             # not iterating over sellers set because order matters
             if node_index in sim.seller_nodes:
-                if sim.is_critical(node_index, self.critical_at) and node_index in self.matching_s:
-                    matchings_reversed[self.matching_s[node_index]] = node_index
+                if self.stochastic:
+                    age_of_node = sim.t - sim.G.nodes[node_index]["added_at"]
+                    if self.probably_critical(age_of_node) and node_index in self.matching_s:
+                        matchings_reversed[self.matching_s[node_index]] = node_index
+                else:
+                    if sim.is_critical(node_index, self.critical_at) and node_index in self.matching_s:
+                        matchings_reversed[self.matching_s[node_index]] = node_index
         return [(buyer, seller) for buyer, seller in matchings_reversed.items()]
+
+    def probably_critical(self, age):
+        return age >= self.guess
 
     def _reset_internals(self):
         self.price_s = defaultdict(float)
